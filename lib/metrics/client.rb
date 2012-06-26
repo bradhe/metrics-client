@@ -12,7 +12,7 @@ module Metrics
     end
 
     def connect!
-      self.socket ||= WebSocket.new("ws://#{@host}:#{@port}")
+      self.socket ||= Metrics::WebSocket.new(ws_url(@host, @port))
     end
 
     def authenticate!
@@ -55,6 +55,10 @@ module Metrics
       val = Time.now.to_i
       response = self.send(ping: val)
       response[:pong] == val
+    end
+
+    def ws_url(server, port)
+      "ws://#{server}:#{port}"
     end
   end
 end

@@ -19,6 +19,8 @@ module Metrics
       attr_accessor(:debug)
     end
 
+    attr_reader :server, :header, :path
+
     class Error < RuntimeError; end
 
     WEB_SOCKET_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
@@ -124,8 +126,6 @@ module Metrics
       @buffer = ""
       @closing_started = false
     end
-
-    attr_reader(:server, :header, :path)
 
     def handshake(status = nil, header = {})
       if @handshaked
