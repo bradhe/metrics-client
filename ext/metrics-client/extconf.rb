@@ -1,2 +1,2 @@
 require 'mkmf'
-create_makefile("client/client")
+create_makefile("metrics-client/metrics-client")
