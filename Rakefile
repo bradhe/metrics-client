@@ -17,10 +17,11 @@ Jeweler::Tasks.new do |gem|
   gem.name = "metrics-client"
   gem.homepage = "http://github.com/bradhe/metrics-client"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Client for pushing data to Metrics}
+  gem.description = %Q{Client for pushing data to Metrics}
   gem.email = "brad@cloudability.com"
   gem.authors = ["Brad Heller"]
+  gem.extensions = %w(ext/metrics/extconf.rb)
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
