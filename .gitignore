@@ -1,3 +1,7 @@
 Makefile
 *.swp
 pkg
+
+# Build spam
+*.o
+*.bundle
