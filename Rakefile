@@ -14,14 +14,14 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "metrics-client"
+  gem.name = "metrics"
   gem.homepage = "http://github.com/bradhe/metrics-client"
   gem.license = "MIT"
-  gem.summary = %Q{Client for pushing data to Metrics}
+  gem.summary = %Q{Push data to Metrics}
   gem.description = %Q{Client for pushing data to Metrics}
   gem.email = "brad@cloudability.com"
   gem.authors = ["Brad Heller"]
-  gem.extensions = %w(ext/metrics-client/extconf.rb)
+  gem.extensions = %w(ext/metrics/extconf.rb)
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
