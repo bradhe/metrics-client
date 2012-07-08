@@ -24,7 +24,7 @@ static VALUE metrics_report_metric(VALUE self, VALUE user_id, VALUE key, VALUE v
   return (result > 0) ? T_TRUE : T_FALSE;
 }
 
-void Init_client(void) {
+void Init_metrics(void) {
   VALUE klass = rb_define_class("Metrics", rb_cObject);
   rb_define_singleton_method(klass, "report_metric", metrics_report_metric, 3);
 }
