@@ -1,54 +1,89 @@
 #include "client.h"
 
-int metric_transmit(char * data, int len) {
-  struct sockaddr_in server_addr;
-  int fd;
+#define SEPERATOR ":"
 
-  if((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-    printf("Could not create socked: %d\n", fd);
-    exit(-1);
-  }
-
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-  server_addr.sin_port = htons(8081);
-
-  if(sendto(fd, data, len, 0, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+int metric_transmit(metrics_connection * conn, char * data, int len) {
+  if(sendto(conn->socket, data, len, 0, conn->server_addr, sizeof(conn->server_addr)) < 0) {
     printf("Failed to send data.\n");
     exit(1);
   }
 
-  close(fd);
+  return(0);
+}
+
+int report_metricd(metrics_connection * conn, const char * metric_name, double value) {
+  char data[1024];
+  int data_len;
+
+  memset(data, '\0', 1024);
+  data_len = sprintf(data, "%s%s%s%s%.8f", conn->user_key, SEPERATOR, metric_name, SEPERATOR, value);
+
+  return metric_transmit(conn, data, data_len);
+}
+
+int report_metricf(metrics_connection * conn, const char * metric_name, float value) {
+  char data[1024];
+  int data_len;
+
+  memset(data, '\0', 1024);
+  data_len = sprintf(data, "%s%s%s%s%.8f", conn->user_key, SEPERATOR, metric_name, SEPERATOR, value);
+
+  return metric_transmit(conn, data, data_len);
+}
+
+int report_metrici(metrics_connection * conn, const char * metric_name, int value) {
+  char data[1024];
+  int data_len;
+
+  memset(data, '\0', 1024);
+  data_len = sprintf(data, "%s%s%s%s%d", conn->user_key, SEPERATOR, metric_name, SEPERATOR, value);
+
+  return metric_transmit(conn, data, data_len);
+}
+
+
+int metrics_connect(char * hostname, int port, char * user_key, metrics_connection ** conn) {
+  struct addrinfo *result;
+  int fd;
+
+  if((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    fprintf(stderr, "Could not create socked: %d\n", fd);
+    exit(-1);
+  }
+
+  if(getaddrinfo((const char *)hostname, NULL, NULL, &result) < 0) {
+    fprintf(stderr, "Could not look up hostname %s", hostname);
+    exit(-1);
+  }
+
+  (*conn) = (metrics_connection *)malloc(sizeof(metrics_connection));
+
+  (*conn)->socket = fd;
+  (*conn)->user_key = (char *)malloc(sizeof(char) * (strlen(user_key) + 1));
+
+  memset((*conn)->user_key, '\0', sizeof(char) * (strlen(user_key) + 1));
+  strcpy((*conn)->user_key, (const char *)user_key);
+
+  (*conn)->server_addr = (struct sockaddr *)malloc(result->ai_addrlen);
+  memcpy(result->ai_addr, (*conn)->server_addr, result->ai_addrlen);
 
   return(0);
 }
 
-int metricd(const char * user_id, const char * metric_name, double value) {
-  char data[1024];
-  int data_len;
+/**
+ * Disconnects from and frees a given metrics_connection object.
+ *
+ * conn - metrics_connection * - The connection object to free.
+ */
+int metrics_disconnect(metrics_connection * conn) {
+  close(conn->socket);
+  conn->socket = -1;
 
-  memset(data, '\0', 1024);
-  data_len = sprintf(data, "%s%s%s%s%.8f", user_id, SEPERATOR, metric_name, SEPERATOR, value);
+  free(conn->server_addr);
+  free(conn->user_key);
 
-  return metric_transmit(data, data_len);
-}
+  /* Finally done with struct itself. */
+  free(conn);
 
-int metricf(const char * user_id, const char * metric_name, float value) {
-  char data[1024];
-  int data_len;
-
-  memset(data, '\0', 1024);
-  data_len = sprintf(data, "%s%s%s%s%.8f", user_id, SEPERATOR, metric_name, SEPERATOR, value);
-
-  return metric_transmit(data, data_len);
-}
-
-int metrici(const char * user_id, const char * metric_name, int value) {
-  char data[1024];
-  int data_len;
-
-  memset(data, '\0', 1024);
-  data_len = sprintf(data, "%s%s%s%s%d", user_id, SEPERATOR, metric_name, SEPERATOR, value);
-
-  return metric_transmit(data, data_len);
+  return(0);
 }

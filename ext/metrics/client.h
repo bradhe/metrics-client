@@ -3,13 +3,20 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#define SEPERATOR ":"
+typedef struct {
+  int socket;
+  char * user_key;
+  struct sockaddr * server_addr;
+} metrics_connection;
 
-int metric_transmit(char *, int);
-int metricd(const char *, const char *, double);
-int metricf(const char *, const char *, float);
-int metrici(const char *, const char *, int);
+int report_metricd(metrics_connection *, const char *, double);
+int report_metricf(metrics_connection *, const char *, float);
+int report_metrici(metrics_connection *, const char *, int);
+
+int metrics_connect(char *, int, char *, metrics_connection **);
+int metrics_disconnect(metrics_connection *);
