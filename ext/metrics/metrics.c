@@ -1,7 +1,7 @@
 #include <ruby.h>
 #include "client.h"
 
-static VALUE metrics_report_metric(VALUE self, VALUE user_id, VALUE key, VALUE val) {
+static VALUE rb_metrics_report_metric(VALUE self, VALUE user_id, VALUE key, VALUE val) {
   char * user_id_str, * key_str;
   int result = 0;
 
@@ -24,7 +24,21 @@ static VALUE metrics_report_metric(VALUE self, VALUE user_id, VALUE key, VALUE v
   return (result > 0) ? T_TRUE : T_FALSE;
 }
 
+static VALUE rb_metrics_initialize(VALUE self, VALUE hostname, VALUE port) {
+  if(!FIXNUM_P(port)) {
+    rb_raise(rb_eTypeError, "Port is not a Fixnum.");
+    return T_FALSE;
+  }
+
+  rb_iv_set(self, "hostname", hostname);
+  rb_iv_set(self, "port", port);
+
+  return T_TRUE;
+}
+
 void Init_metrics(void) {
-  VALUE klass = rb_define_class("Metrics", rb_cObject);
-  rb_define_singleton_method(klass, "report_metric", metrics_report_metric, 3);
+  VALUE rb_mMetrics = rb_define_module("Metrics");
+  VALUE rb_cNativeClient = rb_define_class_under(rb_mMetrics, "NativeClient", rb_cObject);
+  rb_define_singleton_method(rb_cNativeClient, "report_metric", rb_metrics_report_metric, 3);
+  rb_define_method(rb_cNativeClient, "initialize", rb_metrics_initialize, 2);
 }
