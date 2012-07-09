@@ -3,8 +3,9 @@
 #define SEPERATOR ":"
 
 int metric_transmit(metrics_connection * conn, char * data, int len) {
-  if(sendto(conn->socket, data, len, 0, conn->server_addr, sizeof(conn->server_addr)) < 0) {
-    printf("Failed to send data.\n");
+  int result = 0;
+  if((result = sendto(conn->socket, data, len, 0, conn->server_addr, sizeof(*conn->server_addr))) < 0) {
+    fprintf(stderr, "Failed to send data: %d\n", result);
     exit(1);
   }
 
