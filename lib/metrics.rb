@@ -1,4 +1,4 @@
-require 'metrics-client/metrics-client'
+require 'metrics/metrics'
 
 module Metrics
   autoload :WebSocket, 'metrics/web_socket'
